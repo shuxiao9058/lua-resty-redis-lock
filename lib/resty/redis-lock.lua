@@ -1,6 +1,5 @@
 -- Copyright (C) 2013 Bearnard Hibbins
 
-
 local null = ngx.null
 local sleep = ngx.sleep
 local now = ngx.now
@@ -12,24 +11,20 @@ local setmetatable = setmetatable
 local tonumber = tonumber
 local error = error
 
-
-module(...)
-
-_VERSION = '0.1'
-
+local _M = {
+     _VERSION = '0.1'
+}
 
 local mt = { __index = _M }
 
-
-function new(self, redis, key, blocking)
+local function new(self, redis, key, blocking)
     if not redis then
         return nil, "no redis supplied"
     end
     return setmetatable({ redis = redis, key = key, blocking = blocking }, mt)
 end
 
-function acquire(self)
-
+local function acquire(self)
     local sleep_time = 0.2
     local timeout = 2
     self.acquired_until = nil
@@ -74,7 +69,7 @@ function acquire(self)
     end
 end
 
-function release(self)
+local function release(self)
     if not self.acquired_until then
         return false
     end
@@ -102,6 +97,10 @@ local class_mt = {
     end
 }
 
+_M.new = new
+_M.acquire = acquire
+_M.release = release
 
 setmetatable(_M, class_mt)
 
+return _M
